@@ -26,7 +26,6 @@ class LoanModel(BaseModel):
     amount: float
     term: int
     start_date: date
-    due_date: date
     user_id: int
 
     class Config:
@@ -42,3 +41,17 @@ class LoanList(BaseModel):
         from_attributes = True
 
     loans: List[LoanResponse]
+
+class RepayResponse(BaseModel):
+    class Config:
+        from_attributes = True
+    date: date
+    payment: float
+    state: State
+    loan_id: int
+
+class RepayList(BaseModel):
+    class Config:
+        from_attributes = True
+
+    schedule: List[RepayResponse]

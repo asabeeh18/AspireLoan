@@ -40,7 +40,7 @@ class User(Person):
     #     database = db  # This model uses the "people.db" database.
 
 
-class State(str,Enum):
+class State(str, Enum):
     PENDING = 'PENDING'
     APPROVED = 'APPROVED'
     PAID = 'PAID'
@@ -52,16 +52,19 @@ class Loan(BaseModel):
     amount = FloatField()
     term = IntegerField()
     start_date = DateField()
-    due_date = DateField()
+    #due_date = DateField()
 
     state = CharField()  # ForeignKeyField(State, backref='Loan')
     user_id = ForeignKeyField(User, backref='Loan')
+    #
+class Repayment(BaseModel):
+    date = DateField()
+    payment = FloatField()
+    state = CharField()
+    loan = ForeignKeyField(Loan, backref='Repayment')
 
 
 def initialize_db():
     db.connect()
-    db.create_tables([User, Loan], safe=True)
+    db.create_tables([User, Loan, Repayment], safe=True)
     db.close()
-
-
-initialize_db()  # if db tables are not created, create them
