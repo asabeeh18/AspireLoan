@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional, List
 
 import pydantic
-from pydantic import SecretStr, Field, BaseModel
+from pydantic import SecretStr, Field, BaseModel, EmailStr
 
 from src.model import db_model
 from src.model.db_model import User, State
@@ -14,7 +14,7 @@ class UserModel(BaseModel):
         from_attributes = True
 
     name: str
-    email: str
+    email: EmailStr
     password: str
 
 
@@ -26,7 +26,7 @@ class LoanModel(BaseModel):
     amount: float
     term: int
     start_date: date
-    user_id: int
+    user_token: str
 
     class Config:
         from_attributes = True
@@ -42,13 +42,16 @@ class LoanList(BaseModel):
 
     loans: List[LoanResponse]
 
+
 class RepayResponse(BaseModel):
     class Config:
         from_attributes = True
+
     date: date
     payment: float
     state: State
     loan_id: int
+
 
 class RepayList(BaseModel):
     class Config:

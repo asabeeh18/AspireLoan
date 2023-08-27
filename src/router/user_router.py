@@ -2,7 +2,14 @@ from fastapi import APIRouter
 
 from src.db_layer import user_actions
 from src.model.db_model import User
-from src.model.request_model import UserModel, UserResponse, LoanModel, LoanResponse, RepayList
+from src.model.request_model import (
+    UserModel,
+    UserResponse,
+    LoanModel,
+    LoanResponse,
+    RepayList,
+    RepayResponse,
+)
 
 router = APIRouter()
 
@@ -20,18 +27,21 @@ async def get_user(id: int):
 
 @router.post("/new_loan", response_model=LoanResponse)
 async def new_loan(loan: LoanModel):
-    l= user_actions.create_loan(loan)
+    l = user_actions.create_loan(loan)
     return LoanResponse.model_validate(l)
 
 
-
 @router.get("/repay_scehdule/", response_model=RepayList)
-async def get_repayment_schedule(loan_id: int):
-    return user_actions.repay_scedule(loan_id)
+async def get_repayment_schedule(loan_id: int, user_token: str):
+    return user_actions.repay_scedule(loan_id, user_token)
 
 
-
-@router.get("/repay_loan/", tags=["users"])
+@router.get("/repay_loan/", tags=["users"], response_model=RepayResponse)
 async def repay_loan(loan_id: int):
-    return user_actions.repay_loan(loan_id)
+    repay_status = user_actions.repay_loan(loan_id)
+    return RepayResponse.model_validate(repay_status)
 
+
+@router.get("/login/", tags=["users"])
+async def login(email: str, password: str):
+    return user_actions.login(email, password)

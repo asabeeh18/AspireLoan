@@ -2,7 +2,7 @@ from enum import Enum
 
 from peewee import *
 
-db = SqliteDatabase('AspireLoan.db')
+db = SqliteDatabase("AspireLoan.db")
 
 
 class BaseModel(Model):
@@ -41,10 +41,10 @@ class User(Person):
 
 
 class State(str, Enum):
-    PENDING = 'PENDING'
-    APPROVED = 'APPROVED'
-    PAID = 'PAID'
-    REJECTED = 'REJECTED'
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    PAID = "PAID"
+    REJECTED = "REJECTED"
 
 
 class Loan(BaseModel):
@@ -52,16 +52,15 @@ class Loan(BaseModel):
     amount = FloatField()
     term = IntegerField()
     start_date = DateField()
-    #due_date = DateField()
+    state = CharField()
+    user = ForeignKeyField(User, backref="Loan")
 
-    state = CharField()  # ForeignKeyField(State, backref='Loan')
-    user_id = ForeignKeyField(User, backref='Loan')
-    #
+
 class Repayment(BaseModel):
     date = DateField()
     payment = FloatField()
     state = CharField()
-    loan = ForeignKeyField(Loan, backref='Repayment')
+    loan = ForeignKeyField(Loan, backref="Repayment")
 
 
 def initialize_db():
