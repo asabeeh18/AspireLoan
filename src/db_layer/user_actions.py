@@ -1,5 +1,5 @@
 from datetime import timedelta
-
+from peewee import fn
 from playhouse.shortcuts import model_to_dict
 
 from src.model.db_model import User, Loan, State, db, Repayment
@@ -50,11 +50,34 @@ def create_loan(loan: LoanModel):
     l['user_id'] = l['user_id']['user_id']
     return l
 
+
 def repay_scedule(loan_id):
-    loan=Loan.select().where(Loan.loan_id==loan_id).get()
+    loan = Loan.select().where(Loan.loan_id == loan_id).get()
     if loan:
-        repay=Repayment.select().where(Repayment.loan==loan)
-        l=[]
+        repay = Repayment.select().where(Repayment.loan == loan)
+        l = []
         for r in repay:
             l.append(RepayResponse.model_validate(r))
         return RepayList(schedule=l)
+
+
+def repay_loan(loan_id):
+    loan = Loan.select().where(Loan.loan_id == loan_id)#.for_update()
+    if not loan: # or loan.state!=State.APPROVED:
+        raise
+
+    repay = Repayment.select().where(
+        Repayment.loan == loan_id and Repayment.state == State.PENDING)#.for_update()
+    if repay:
+        from peewee import fn
+
+        x = repay.select().order_by(Repayment.date.asc()).get()
+        x.state=State.PAID
+        x.save()
+        if all(i.state==State.PAID for i in repay):
+            loan=loan.get()
+            loan.state=State.PAID
+            loan.save()
+    else: raise
+
+    return RepayResponse.model_validate(x),LoanModel.model_validate(loan)

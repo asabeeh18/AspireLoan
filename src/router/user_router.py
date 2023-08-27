@@ -26,12 +26,12 @@ async def new_loan(loan: LoanModel):
 
 
 @router.get("/repay_scehdule/", response_model=RepayList)
-async def get_repaymnet_schedule(loan_id: int):
+async def get_repayment_schedule(loan_id: int):
     return user_actions.repay_scedule(loan_id)
 
 
 
 @router.get("/repay_loan/", tags=["users"])
-async def repay_loan(username: str):
-    return {"username": username}
+async def repay_loan(loan_id: int):
+    return user_actions.repay_loan(loan_id)
 
