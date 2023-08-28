@@ -14,15 +14,6 @@ class Person(BaseModel):
     name = CharField()
     email = CharField()
     password = CharField()
-    """
-    'full_name',
-        'email',
-        'password',
-        'signup_role',
-        'signup_looking_for',
-        'heard_through',
-        'email_verified_at',
-        """
 
 
 class Admin(Person, BaseModel):
@@ -31,13 +22,6 @@ class Admin(Person, BaseModel):
 
 class User(Person):
     user_id = AutoField()
-    pass
-    # name = CharField()
-    # email = CharField()
-    # password = CharField()
-    #
-    # class Meta:
-    #     database = db  # This model uses the "people.db" database.
 
 
 class State(str, Enum):

@@ -88,7 +88,6 @@ def get_loan_and_repay(loan_id: int):
 
     loan = get_loan(loan_id)
     # Need to make sure loan is approved to accept payment
-    loan = loan.get()
     if loan.state != State.APPROVED:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

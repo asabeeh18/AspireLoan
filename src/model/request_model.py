@@ -17,26 +17,25 @@ class UserModel(BaseModel):
 
 class UserResponse(UserModel):
     password: SecretStr = Field(..., exclude=True)
+    user_id: int
 
 
-class Loan():
+class Loan(BaseModel):
     amount: float
     term: int
     start_date: date
 
+    class Config:
+        from_attributes = True
 
-class RequestLoanModel(BaseModel, Loan):
+
+class RequestLoanModel(Loan):
     user_token: str
 
-    class Config:
-        from_attributes = True
 
-
-class ResponseLoanModel(BaseModel, Loan):
+class ResponseLoanModel(Loan):
     loan_id: int
 
-    class Config:
-        from_attributes = True
 
 class LoanList(BaseModel):
     class Config:
