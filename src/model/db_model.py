@@ -12,7 +12,7 @@ class BaseModel(Model):
 
 class Person(BaseModel):
     name = CharField()
-    email = CharField()
+    email = CharField(unique=True)
     password = CharField()
 
 

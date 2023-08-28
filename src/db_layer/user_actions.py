@@ -1,6 +1,9 @@
 from datetime import timedelta
 
 from fastapi import HTTPException
+from starlette import status
+
+from libs.login_manager import register_user_session, get_user_id_from_token
 from model.db_model import User, Loan, State, db, Repayment
 from model.request_model import (
     UserModel,
@@ -8,49 +11,70 @@ from model.request_model import (
     RepayResponse,
     RepayList,
 )
-from playhouse.shortcuts import model_to_dict
-from starlette import status
 
 
 def new_user(user: UserModel):
+    """
+    Function to create a new user and save it in db
+    :param user: User model object which contains basic user details
+    :return: User object with user_id
+    """
     u = User(name=user.name, email=user.email, password=user.password)
     u.save()
     return u
 
 
-def get_user(id: int):
-    users = User.select().where(User.user_id == id).get()
-    return users
+def get_user_with_id(user_id):
+    user = User.select().where(User.user_id == user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"No user found with id: {user_id}",
+        )
+    return user.get()
+
+
+def get_user(user_id: int) -> User:
+    """
+    Retrieve user object from db
+    :param user_id: user_id
+    :return:
+    """
+    return get_user_with_id(user_id)
 
 
 def create_loan(loan: RequestLoanModel):
-    if loan.user_token not in user_session:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"User is not logged in or incorrect token",
-        )
-    l = Loan(**loan.model_dump())
-    loan_user = User.select().where(user_session[loan.user_token] == User.user_id).get()
+    user_id = get_user_id_from_token(loan.user_token)
+    loan_db = Loan(**loan.model_dump())
 
-    l.user = loan_user
-    l.state = State.PENDING.value
+    # Get the user object for new loan
+    loan_user = (
+        User.select()
+            .where(get_user_id_from_token(loan.user_token) == User.user_id)
+            .get()
+    )
+
+    loan_db.user = loan_user
+    loan_db.state = State.PENDING.value
+
+    # Create repayment objects for this loan
     repay = loan.amount / loan.term
     with db.atomic():
-        l.save()
+        loan_db.save()
         for i in range(loan.term):
             Repayment.create(
                 date=loan.start_date + timedelta(days=(i + 1) * 7),
                 payment=repay,
                 state=State.PENDING.value,
-                loan=l,
+                loan=loan_db,
             )
-    return l
+    return loan_db
 
 
-def loan_to_loan_model(l):
-    l = model_to_dict(l)
-    l["user_id"] = l["user_id"]["user_id"]
-    return l
+# def loan_to_loan_model(l):
+#     l = model_to_dict(l)
+#     l["user_id"] = l["user_id"]["user_id"]
+#     return l
 
 
 def get_loan(loan_id):
@@ -63,9 +87,9 @@ def get_loan(loan_id):
     return loan.get()
 
 
-def repay_scedule(loan_id, user_token):
+def repay_schedule(loan_id, user_token):
     loan = get_loan(loan_id)
-    if loan.user.user_id != user_session[user_token]:
+    if loan.user.user_id != get_user_id_from_token(user_token):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"User with token {user_token} is forbidden to access loan with id {loan_id}",
@@ -95,7 +119,7 @@ def get_loan_and_repay(loan_id: int):
 
     # Use .for_update() after select if supported by DB to lock rows
     repay = Repayment.select().where(
-        Repayment.loan == loan_id and Repayment.state == State.PENDING
+        Repayment.loan == loan_id, Repayment.state == State.PENDING
     )
 
     if not repay:
@@ -126,10 +150,13 @@ def repay_loan(loan_id: int) -> Repayment:
     return x
 
 
-user_session = {}
-
-
 def login(email: str, password: str):
+    """
+    Log ins the user and stores the session key wit user id
+    :param email:
+    :param password:
+    :return: token string which identifies user for some APIs
+    """
     user = User.select(User.user_id).where(
         User.email == email, User.password == password
     )
@@ -139,6 +166,5 @@ def login(email: str, password: str):
             detail=f"User {email} does not exist or incorrect password",
         )
     user_id = user.scalar()
-    token = str(hash(str(user_id)))
-    user_session[token] = user_id
+    token = register_user_session(user_id)
     return token

@@ -1,5 +1,6 @@
-from db_layer import user_actions
 from fastapi import APIRouter
+
+from db_layer import user_actions
 from model.request_model import (
     UserModel,
     UserResponse,
@@ -31,7 +32,7 @@ async def new_loan(loan: RequestLoanModel):
 
 @router.get("/repay_scehdule/", response_model=RepayList)
 async def get_repayment_schedule(loan_id: int, user_token: str):
-    return user_actions.repay_scedule(loan_id, user_token)
+    return user_actions.repay_schedule(loan_id, user_token)
 
 
 @router.get("/repay_loan/", tags=["users"], response_model=RepayResponse)

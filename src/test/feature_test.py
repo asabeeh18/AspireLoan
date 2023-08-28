@@ -1,10 +1,11 @@
 import unittest
 
 from fastapi.testclient import TestClient
+from starlette import status
+
 from main import app
 from model import db_model
 from model.request_model import RequestLoanModel
-from starlette import status
 
 
 def login(cls) -> None:
@@ -19,9 +20,8 @@ class MyTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         import os
-
-        os.remove("AspireLoan.db")
-
+        if os.path.exists("AspireLoan.db"):
+            os.remove("AspireLoan.db")
         db_model.initialize_db()
 
     def test_01_new_user(self):
