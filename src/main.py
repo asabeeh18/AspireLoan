@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from router import user_router, admin_router
+from src.router import user_router, admin_router
 import uvicorn
 
 from src.model.db_model import initialize_db
