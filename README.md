@@ -3,7 +3,7 @@
 ## Installation
 
 - Built on python 3.9
-- > cd AspireLoan\src
+- > cd AspireLoan/src
 - > python3 -m venv AspireLoanVenv
 - > source AspireLoanVenv/bin/activate
 - > pip3 install -r app/src/requirements.txt
