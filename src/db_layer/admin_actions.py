@@ -1,9 +1,8 @@
 from fastapi import HTTPException
+from model.db_model import Loan, State
+from model.request_model import ResponseLoanModel, LoanList
 from playhouse.shortcuts import model_to_dict
 from starlette import status
-
-from src.model.db_model import Loan, State
-from src.model.request_model import ResponseLoanModel, LoanList
 
 
 def get_pending_loans():

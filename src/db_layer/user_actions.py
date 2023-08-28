@@ -1,16 +1,15 @@
 from datetime import timedelta
 
 from fastapi import HTTPException
-from playhouse.shortcuts import model_to_dict
-from starlette import status
-
-from src.model.db_model import User, Loan, State, db, Repayment
-from src.model.request_model import (
+from model.db_model import User, Loan, State, db, Repayment
+from model.request_model import (
     UserModel,
     RequestLoanModel,
     RepayResponse,
     RepayList,
 )
+from playhouse.shortcuts import model_to_dict
+from starlette import status
 
 
 def new_user(user: UserModel):

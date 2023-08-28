@@ -1,7 +1,6 @@
+from db_layer import user_actions
 from fastapi import APIRouter
-
-from src.db_layer import user_actions
-from src.model.request_model import (
+from model.request_model import (
     UserModel,
     UserResponse,
     RequestLoanModel,

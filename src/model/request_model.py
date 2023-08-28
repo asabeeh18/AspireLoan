@@ -1,9 +1,8 @@
 from datetime import date
 from typing import List
 
+from model.db_model import State
 from pydantic import SecretStr, Field, BaseModel, EmailStr
-
-from src.model.db_model import State
 
 
 class UserModel(BaseModel):

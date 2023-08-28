@@ -1,11 +1,10 @@
 import unittest
 
 from fastapi.testclient import TestClient
+from main import app
+from model import db_model
+from model.request_model import RequestLoanModel
 from starlette import status
-
-from src.main import app
-from src.model import db_model
-from src.model.request_model import RequestLoanModel
 
 
 def login(cls) -> None:
