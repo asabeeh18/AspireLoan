@@ -44,6 +44,11 @@ def get_user(user_id: int) -> User:
 
 
 def create_loan(loan: RequestLoanModel):
+    """
+
+    :param loan: Loan model which has the loan details from the user
+    :return:
+    """
     user_id = get_user_id_from_token(loan.user_token)
     loan_db = Loan(**loan.model_dump())
 
@@ -69,12 +74,6 @@ def create_loan(loan: RequestLoanModel):
                 loan=loan_db,
             )
     return loan_db
-
-
-# def loan_to_loan_model(l):
-#     l = model_to_dict(l)
-#     l["user_id"] = l["user_id"]["user_id"]
-#     return l
 
 
 def get_loan(loan_id):
@@ -117,6 +116,7 @@ def get_loan_and_repay(loan_id: int):
             detail=f"Loan id {loan_id} with state {loan.state} is not allowed for repayment",
         )
 
+    # Select all the pending payments for this loan id
     # Use .for_update() after select if supported by DB to lock rows
     repay = Repayment.select().where(
         Repayment.loan == loan_id, Repayment.state == State.PENDING
