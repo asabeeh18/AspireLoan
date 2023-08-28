@@ -1,14 +1,13 @@
 from datetime import timedelta
 
 from fastapi import HTTPException
-from peewee import fn
 from playhouse.shortcuts import model_to_dict
 from starlette import status
 
 from src.model.db_model import User, Loan, State, db, Repayment
 from src.model.request_model import (
     UserModel,
-    LoanModel,
+    RequestLoanModel,
     RepayResponse,
     RepayList,
 )
@@ -25,7 +24,7 @@ def get_user(id: int):
     return users
 
 
-def create_loan(loan: LoanModel):
+def create_loan(loan: RequestLoanModel):
     if loan.user_token not in user_session:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

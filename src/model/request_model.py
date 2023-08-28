@@ -1,12 +1,9 @@
 from datetime import date
-from enum import Enum
-from typing import Optional, List
+from typing import List
 
-import pydantic
 from pydantic import SecretStr, Field, BaseModel, EmailStr
 
-from src.model import db_model
-from src.model.db_model import User, State
+from src.model.db_model import State
 
 
 class UserModel(BaseModel):
@@ -22,25 +19,30 @@ class UserResponse(UserModel):
     password: SecretStr = Field(..., exclude=True)
 
 
-class LoanModel(BaseModel):
+class Loan():
     amount: float
     term: int
     start_date: date
+
+
+class RequestLoanModel(BaseModel, Loan):
     user_token: str
 
     class Config:
         from_attributes = True
 
 
-class LoanResponse(LoanModel):
+class ResponseLoanModel(BaseModel, Loan):
     loan_id: int
 
+    class Config:
+        from_attributes = True
 
 class LoanList(BaseModel):
     class Config:
         from_attributes = True
 
-    loans: List[LoanResponse]
+    loans: List[ResponseLoanModel]
 
 
 class RepayResponse(BaseModel):

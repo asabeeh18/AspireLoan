@@ -1,12 +1,11 @@
 from fastapi import APIRouter
 
 from src.db_layer import user_actions
-from src.model.db_model import User
 from src.model.request_model import (
     UserModel,
     UserResponse,
-    LoanModel,
-    LoanResponse,
+    RequestLoanModel,
+    ResponseLoanModel,
     RepayList,
     RepayResponse,
 )
@@ -25,10 +24,10 @@ async def get_user(id: int):
     return UserResponse.model_validate(user)
 
 
-@router.post("/new_loan", response_model=LoanResponse)
-async def new_loan(loan: LoanModel):
+@router.post("/new_loan", response_model=ResponseLoanModel)
+async def new_loan(loan: RequestLoanModel):
     l = user_actions.create_loan(loan)
-    return LoanResponse.model_validate(l)
+    return ResponseLoanModel.model_validate(l)
 
 
 @router.get("/repay_scehdule/", response_model=RepayList)

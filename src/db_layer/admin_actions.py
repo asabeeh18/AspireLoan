@@ -3,14 +3,14 @@ from playhouse.shortcuts import model_to_dict
 from starlette import status
 
 from src.model.db_model import Loan, State
-from src.model.request_model import LoanResponse, LoanList
+from src.model.request_model import ResponseLoanModel, LoanList
 
 
 def get_pending_loans():
     loans = Loan.select().where(Loan.state == State.PENDING.value).dicts()
     res = []
     for l in loans:
-        res.append(LoanResponse.model_validate(l))
+        res.append(ResponseLoanModel.model_validate(l))
 
     return LoanList(loans=res)
 
@@ -33,5 +33,6 @@ def action_pending_loan(loan_id: int, action: State):
             detail=f"No loan found with id: {loan_id}",
         )
     loan = model_to_dict(loan)
-    loan["user_id"] = loan["user_id"]["user_id"]
+    loan["user_id"] = loan["user"]["user_id"]
+    del loan['user']
     return loan
