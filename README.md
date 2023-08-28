@@ -3,9 +3,11 @@
 ## Installation
 
 - Built on python 3.9
+- > cd AspireLoan\src
 - > python3 -m venv AspireLoanVenv
 - > source AspireLoanVenv/bin/activate
 - > pip3 install -r app/src/requirements.txt
+- > python main.py
 - Or using docker deploy the dockerfile on Docker Engine bound on port 8000
 - Access the swagger page on http://localhost:8000/docs
 
