@@ -1,8 +1,9 @@
-from db_layer import admin_actions
 from fastapi import APIRouter, HTTPException
+from starlette import status
+
 from model.db_model import State
 from model.request_model import LoanList, ResponseLoanModel
-from starlette import status
+from transformer import admin_actions
 
 router = APIRouter()
 

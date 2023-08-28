@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from db_layer import user_actions
 from model.request_model import (
     UserModel,
     UserResponse,
@@ -9,6 +8,7 @@ from model.request_model import (
     RepayList,
     RepayResponse,
 )
+from transformer import user_actions
 
 router = APIRouter()
 

@@ -1,17 +1,8 @@
-from fastapi import HTTPException
 from playhouse.shortcuts import model_to_dict
-from starlette import status
 
 from model.db_model import Loan, State
 from model.request_model import ResponseLoanModel, LoanList
-
-
-def get_pending_with_id(loan_id):
-    loan = Loan.select().where(Loan.loan_id == loan_id, Loan.state == State.PENDING)
-    if not loan:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail=f"No loan found with id: {loan_id} or loan not in pending state", )
-    return loan.get()
+from transformer.db_accessor import get_pending_with_id
 
 
 def get_pending_loans() -> LoanList:

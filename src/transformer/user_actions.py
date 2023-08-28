@@ -11,6 +11,7 @@ from model.request_model import (
     RepayResponse,
     RepayList,
 )
+from transformer.db_accessor import get_loan_and_repay, get_loan
 
 
 def new_user(user: UserModel):
@@ -76,16 +77,6 @@ def create_loan(loan: RequestLoanModel):
     return loan_db
 
 
-def get_loan(loan_id):
-    loan = Loan.select().where(Loan.loan_id == loan_id)  # .for_update()
-    if not loan:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Loan with id {loan_id} not found",
-        )
-    return loan.get()
-
-
 def repay_schedule(loan_id, user_token):
     loan = get_loan(loan_id)
     if loan.user.user_id != get_user_id_from_token(user_token):
@@ -99,35 +90,6 @@ def repay_schedule(loan_id, user_token):
     for r in repay:
         l.append(RepayResponse.model_validate(r))
     return RepayList(schedule=l)
-
-
-def get_loan_and_repay(loan_id: int):
-    """
-    Returns the loan object and all repayment currently due, raises exception otherwise
-    :param loan_id: Unique identifier of the loan
-    :return:
-    """
-
-    loan = get_loan(loan_id)
-    # Need to make sure loan is approved to accept payment
-    if loan.state != State.APPROVED:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Loan id {loan_id} with state {loan.state} is not allowed for repayment",
-        )
-
-    # Select all the pending payments for this loan id
-    # Use .for_update() after select if supported by DB to lock rows
-    repay = Repayment.select().where(
-        Repayment.loan == loan_id, Repayment.state == State.PENDING
-    )
-
-    if not repay:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"No repayment found for Loan id {loan_id}",
-        )
-    return loan, repay
 
 
 def repay_loan(loan_id: int) -> Repayment:
